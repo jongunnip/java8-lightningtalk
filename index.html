@@ -43,7 +43,7 @@
     <h3 style="font-size:1.2em;margin-bottom:2em">Writing Java has never been so fun</h3>
 
     <p style="text-align: right">
-        <a href="https://twitter.com/bentolor">@bentolor</a>
+        <a href="https://github.com/bentolor/java8-lightningtalk">Based on https://github.com/bentolor/java8-lightningtalk</a>
     </p>
 </section>
 
@@ -168,36 +168,6 @@ public interface Comparator&lt;T&gt; {
 
 
 <section>
-
-    <section>
-        <h2 class="slide-header">Interface <code>default</code> methods</h2>
-        <p>In Java 8 you can write:</p>
-        <pre><code class="java">List&lt;Integer&gt; numbers = Arrays.asList(3, 5, 1, 2, 6);
-numbers.sort(Comparator.naturalOrder());</code></pre>
-
-        <p class="tgap fragment">Huh? <code>java..util.List</code> now requires a <code>sort()</code>-Method?<br/>Will all of my code break now?</p>
-
-        <pre class="fragment"><code class="java">public interface List&lt;E&gt; extends Collection&ltE&gt; {
-    // ...
-    default void sort(Comparator&lt;? super E&gt; c) {
-        // ...
-    }
-}</code></pre>
-    </section>
-
-    <section>
-        <h2 class="slide-header">Interface <code>static</code> methods</h2>
-        <pre><code class="java">private interface PersonFactory {
-    // Interfaces now allow static methods
-    static Person createPerson( String firstname, String lastname ) {
-        return new Person(firstname, lastname);
-    }
-}</code></pre>
-    </section>
-
-</section>
-
-<section>
     <section>
         <h2 class="slide-header">Method references</h2>
 
@@ -228,6 +198,36 @@ public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
 </section>
 
 
+
+<section>
+
+    <section>
+        <h2 class="slide-header">Interface <code>default</code> methods</h2>
+        <p>In Java 8 you can write:</p>
+        <pre><code class="java">List&lt;Integer&gt; numbers = Arrays.asList(3, 5, 1, 2, 6);
+numbers.sort(Comparator.naturalOrder());</code></pre>
+
+        <p class="tgap fragment">Huh? <code>java..util.List</code> now requires a <code>sort()</code>-Method?<br/>Will all of my code break now?</p>
+
+        <pre class="fragment"><code class="java">public interface List&lt;E&gt; extends Collection&ltE&gt; {
+    // ...
+    default void sort(Comparator&lt;? super E&gt; c) {
+        // ...
+    }
+}</code></pre>
+    </section>
+
+    <section>
+        <h2 class="slide-header">Interface <code>static</code> methods</h2>
+        <pre><code class="java">private interface PersonFactory {
+    // Interfaces now allow static methods
+    static Person createPerson( String firstname, String lastname ) {
+        return new Person(firstname, lastname);
+    }
+}</code></pre>
+    </section>
+
+</section>
 
 <section>
     <h2 class="slide-header" style="font-size:3em;margin-top: 50px">Runtime library enhancement</h2>
@@ -428,10 +428,6 @@ org.springframework.core-3.0.5.jar -> lib\rt.jar
 </div>
 
 </div>
-<iframe src="http://ghbtns.com/github-btn.html?user=bentolor&repo=java8-lightningtalk&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20" style="position: absolute; top: 20px; left: 20px; z-index: 9999"></iframe>
-<a href="https://github.com/bentolor/java8-lightningtalk" style="position: absolute; top: 0; right: 0; z-index: 9999">
-<img style="border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub">
-</a>
 
 <script src="lib/js/head.min.js"></script>
 <script src="js/reveal.min.js"></script>
