@@ -133,6 +133,25 @@ Arrays.asList( "a", "b", "d" ).sort( ( e1, e2 ) -> {
 } );        </code></pre>
     </section>
 
+    <section>
+        <h2>Lambdas</h2>
+
+        <p>More succint expression for deferred evaluation of parameters</p>
+        <pre><code class="java">// Java 6
+if (logger.isDebugEnabled()) {
+   logger.debug(generateExpensiveLogMessage());
+}
+
+// Java 8
+logger.debug(() -> generateExpensiveLogMessage());</code></pre>
+
+        <p>Logging library updated with:</p>
+        <pre><code class="java">public void debug(Supplier&lt;String&gt; messageSupplier) {
+    if (isLoggerEnabled(LogLevel.DEBUG)) {
+        debug(messageSupplier.get());
+    }
+}</code></pre>
+    </section>
 </section>
 
 <section>
@@ -182,7 +201,8 @@ public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
 
         <div class="fragment tgap">
             <p>We can simply reuse existing other implementations</p>
-            <pre><code class="java">format(32, Integer::toHexString)</code></pre>
+            <pre><code class="java">// Integer::toHexString signature is (Integer) -&gt; String
+format(32, Integer::toHexString)</code></pre>
         </div>
     </section>
 
@@ -190,14 +210,53 @@ public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
         <h2 >Supported method references</h2>
         <ul>
             <li><strong>static method:</strong> 	<code>Class::staticMethodName</code></li>
-            <li><strong>instance method of a <em>particular</em> object</strong> <code>object::methodName</code></li>
             <li><strong>instance method of an <em>arbitrary</em> object</strong> <code>Type::methodName</code></li>
+            <li><strong>instance method of a <em>particular</em> object</strong> <code>object::methodName</code></li>
             <li><strong>constructor:</strong>	<code>ClassName::new</code></li>
         </ul>
     </section>
+
+    <section>
+        <h2 >Method reference examples</h2>
+        <pre><code class="java">// static method: (String) -&gt; void
+Consumer&lt;String&gt; println = System.out::println;
+println.accept("Hello");
+
+// instace method of an arbitrary object: (String, String) -> String
+BinaryOperator&lt;String&gt; concat = String::concat;
+System.out.println( concat.apply("today", " is great") );
+        
+// instace method of a particular object: (String) -&gt; String
+UnaryOperator&lt;String&gt; concatInstance = "yes"::concat;
+System.out.println( concatInstance.apply(", it is") );
+
+// constructor with no params, () -&gt; Date, and int param, (Integer) -&gt; Date
+Supplier&lt;Date&gt; date = Date::new;
+Function&lt;Integer, Date&gt; dateWithMillis = Date::new;
+System.out.println( "Today is " + date.get() + ", Epoch is " + dateWithMillis.apply(0) );</code></pre>
+    </section>
+
+    <section>
+        <h2 >Progression to method references</h2>
+        <pre><code class="java">List&lt;File&gt; files = new ArrayList&lt;&gt;();
+files.sort(new Comparator&lt;File&gt;() {
+    @Override
+    public int compare(File file1, File file2) {
+        return file1.getName().compareTo(file2.getName());
+    }
+});</code></pre>
+
+<pre class="fragment"><code class="java">files.sort((file1, file2) -&gt; file1.getName().compareTo(file2.getName()));</code></pre>
+
+<pre class="fragment"><code class="java">// Comparator::comparing creates Comparator based on Comparable sort key
+import static java.util.Comparator.comparing;
+files.sort(comparing(file -&gt; file.getName()));</code></pre>
+
+<pre class="fragment"><code class="java">files.sort(comparing(File::getName));</code></pre>
+</code></pre>
+
+    </section>
 </section>
-
-
 
 <section>
 
@@ -207,7 +266,7 @@ public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
         <pre><code class="java">List&lt;Integer&gt; numbers = Arrays.asList(3, 5, 1, 2, 6);
 numbers.sort(Comparator.naturalOrder());</code></pre>
 
-        <p class="tgap fragment">Huh? <code>java..util.List</code> now requires a <code>sort()</code>-Method?<br/>Will all of my code break now?</p>
+        <p class="tgap fragment">Huh? <code>java..util.List</code> now requires a <code>sort()</code>-Method?<br/>Will all of my Java 6 list implementations break now?</p>
 
         <pre class="fragment"><code class="java">public interface List&lt;E&gt; extends Collection&ltE&gt; {
     // ...
@@ -241,7 +300,7 @@ numbers.sort(Comparator.naturalOrder());</code></pre>
         <pre><code class="java mb-30">Collection&lt;Task&gt; tasks = getTasks();
 long totalPointsOfOpenTasks = tasks
     .stream()
-    .filter( task -> task.getStatus() == Status.OPEN )
+    .filter( task -&gt; task.getStatus() == Status.OPEN )
     .mapToInt( Task::getPoints )
     .sum();
 
@@ -260,6 +319,34 @@ System.out.println( "Total points: " + totalPointsOfOpenTasks );</code></pre>
         <h4>Parallel processing</h4>
         <p>Out-of-the box support of parallel processing (Multi-threading!)</p>
         <p><pre><code>stream.parallel()</code></pre></p>
+    </section>
+
+    <section>
+        <h2 class="slide-header">Streams are Lazy</h2>
+
+        <p>Stream of all primes (not efficient!)</p>
+
+        <pre><code class="java" >Stream&lt;Integer&gt; allPrimes = Stream.iterate(2, i -> i + 1)
+            .filter( i -> IntStream.range(2, i).noneMatch( (prime) -> i % prime == 0 ) );
+
+System.out.println( "First 100 primes: " + allPrimes.limit(100).collect( toList() ) );</code></pre>
+    </section>
+
+    <section>
+        <h2 class="slide-header">Streams for Grouping</h2>
+
+        <p>Partition into files/directories</p>
+
+        <pre><code class="java" >Map&lt;&gt;Boolean, List&lt;File&gt;&gt; filesByType = files.stream()
+                .collect( Collectors.groupingBy(File::isFile) );
+</code></pre>
+
+        <p>Further partition by first letter of file</p>
+
+<pre><code class="java" >Map&lt;Boolean, Map&lt;String, List&lt;&gt;File&gt;&gt;&gt; filesByTypeByLetter = files.stream()
+                .collect( groupingBy(File::isFile, 
+                     groupingBy( (File f) -&gt; f.getName().substring(0, 1) ));
+</code></pre>
     </section>
 
     <section>
@@ -314,6 +401,39 @@ System.out.println( engine.eval( "function f() { return 1; }; f() + 1;" ) );</co
     </section>
 
     <section>
+        <h2 class="slide-header"> Date/Time API (JSR 310)</h2>
+
+        <ul>
+            <li>Immutable, time-zone less data types (<code>LocalDate, LocalTime, LocalDateTime</code>) </li>
+            <li>More convenience & easier operations.</li>
+            </li>
+        </ul>
+
+        <pre><code class="java" >import static java.time.temporal.TemporalAdjusters.*;
+LocalDate date1 = LocalDate.of(2014, 3, 18); // 2014-03-18
+LocalDate date2 = date1.with(nextOrSame(DayOfWeek.SUNDAY)); // 2014-03-23
+LocalDate date3 = date2.with(lastDayOfMonth()); // 2014-03-31</code></pre>
+    </section>
+
+    <section>
+        <h2 class="slide-header" style="font-size:3em;margin-top: 50px">Better type inference</h2>
+
+        <p>Diaomond operator, &lt;&gt;, introduced in Java 7</p>
+
+        <pre><code class="java" >Map&lt;String,File&gt; filesByName = new HashMap&lt;&gt;();</code></pre>
+
+        <p>In Java8, method arguments now used to infer generic types</p>
+
+        <pre><code class="java" >import static java.util.Collections.emptyList;
+
+processList(emptyList());
+
+static void processList(List&lt;String&gt; list) {
+    list.forEach(System.out::println);
+}</code></pre>
+    </section>
+
+    <section>
         <h2 class="slide-header">Better Annotations</h2>
 
         <h5>Repeatable</h5>
@@ -333,25 +453,14 @@ myString = (@NonNull String) myObject;</code></pre>
     </section>
 
     <section>
-        <h2 class="slide-header" style="font-size:3em;margin-top: 50px">Better type inference</h2>
-    </section>
-
-    <section>
         <h2 class="slide-header">Parameter names</h2>
+
+        <p>If compiled with <code>-parameters</code> option...<p>
 
         <pre><code class="java mb-30">Method method = ParameterNames.class.getMethod( "main", String[].class );
 for( final Parameter parameter: method.getParameters() ) {
   System.out.println( "Parameter: " + parameter.getName() );
 }</code></pre>
-    </section>
-
-    <section>
-        <h2 class="slide-header"> Date/Time API (JSR 310)</h2>
-
-        <ul>
-            <li>More convenience & easier operations. </li>
-            <li>Time-zone less data types (i.e. <code>LocalDate</code>) </li>
-        </ul>
     </section>
 
     <section>
@@ -373,7 +482,6 @@ for( final Parameter parameter: method.getParameters() ) {
     <section>
         <h2 class="slide-header">Small enhancements in <code>java.util.concurrent</code></h2>
     </section>
-
 
 </section>
 
@@ -414,8 +522,8 @@ org.springframework.core-3.0.5.jar -> lib\rt.jar
 <section>
     <h2 class="slide-header">Resources</h2>
     <ul>
-        <li><a href="http://www.javacodegeeks.com/2014/05/java-8-features-tutorial.html#new_java_tools">Java 8 Features – The ULTIMATE Guide</a></li>
-        <li><a href="http://java.dzone.com/articles/whats-wrong-java-8-part-vi">Whats wrong with Java 8</a></li>
+        <li><a href="http://www.javacodegeeks.com/2014/05/java-8-features-tutorial.html">Java 8 Features – The ULTIMATE Guide</a></li>
+        <li><a href="http://java.dzone.com/articles/whats-wrong-java-8-currying-vs">Whats wrong with Java 8</a> (series of 7 articles)</li>
         <li><a href="http://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html#StreamOps">Streams API</a></li>
         <li><a href="https://github.com/java8/Java8InAction/">Java 8 in Action</a></li>
     </ul>
