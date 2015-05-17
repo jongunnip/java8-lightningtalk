@@ -246,13 +246,14 @@ files.sort(new Comparator&lt;File&gt;() {
     }
 });</code></pre>
 
-<pre class="fragment"><code class="java">files.sort((file1, file2) -&gt; file1.getName().compareTo(file2.getName()));</code></pre>
+<pre class="fragment"><code class="java">files.sort( (file1, file2) -&gt; file1.getName().compareTo(file2.getName()) );</code></pre>
 
 <pre class="fragment"><code class="java">// Comparator::comparing creates Comparator based on Comparable sort key
 import static java.util.Comparator.comparing;
-files.sort(comparing(file -&gt; file.getName()));</code></pre>
 
-<pre class="fragment"><code class="java">files.sort(comparing(File::getName));</code></pre>
+files.sort( comparing(file -&gt; file.getName()) );</code></pre>
+
+<pre class="fragment"><code class="java">files.sort( comparing(File::getName) );</code></pre>
 </code></pre>
 
     </section>
@@ -327,7 +328,7 @@ System.out.println( "Total points: " + totalPointsOfOpenTasks );</code></pre>
         <p>Stream of all primes (not efficient!)</p>
 
         <pre><code class="java" >Stream&lt;Integer&gt; allPrimes = Stream.iterate(2, i -> i + 1)
-            .filter( i -> IntStream.range(2, i).noneMatch( (prime) -> i % prime == 0 ) );
+            .filter( i -> IntStream.range(2, i).noneMatch( prime -> i % prime == 0 ) );
 
 System.out.println( "First 100 primes: " + allPrimes.limit(100).collect( toList() ) );</code></pre>
     </section>
@@ -359,7 +360,7 @@ final Collection&lt;String&gt; result = tasks
         .asLongStream()                                  // LongStream
         .mapToDouble( points -> points / totalPoints )   // DoubleStream
         .boxed()                                         // Stream&lt;Double&gt;
-        .mapToLong( weigth -> ( long )( weigth * 100 ) ) // LongStream
+        .mapToLong( weight -> ( long )( weight * 100 ) ) // LongStream
         .mapToObj( percentage -> percentage + "%" )      // Stream&lt;String&gt;
         .collect( Collectors.toList() );                 // List&lt;String&gt;
 
