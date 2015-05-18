@@ -323,14 +323,14 @@ System.out.println( "Total points: " + totalPointsOfOpenTasks );</code></pre>
     </section>
 
     <section>
-        <h2 class="slide-header">Streams are Lazy</h2>
+        <h2 class="slide-header">Streams are lazy and can be infinite</h2>
 
         <p>Stream of all primes (not efficient!)</p>
 
-        <pre><code class="java" >Stream&lt;Integer&gt; allPrimes = Stream.iterate(2, i -> i + 1)
-            .filter( i -> IntStream.range(2, i).noneMatch( prime -> i % prime == 0 ) );
+        <pre><code class="java" >Stream&lt;Integer&gt; primes = Stream.iterate(2, i -> i + 1)
+      .filter( i -> IntStream.range(2, i).noneMatch( prime -> i % prime == 0 ) );
 
-System.out.println( "First 100 primes: " + allPrimes.limit(100).collect( toList() ) );</code></pre>
+System.out.println("First 100 primes: " + primes.limit(100).collect( toList() ));</code></pre>
     </section>
 
     <section>
