@@ -200,7 +200,7 @@ public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
 }</code></pre>
 
         <div class="fragment tgap">
-            <p>We can simply reuse existing other implementations</p>
+            <p>We can simply reuse existing implementations</p>
             <pre><code class="java">// Integer::toHexString signature is (Integer) -&gt; String
 format(32, Integer::toHexString)</code></pre>
         </div>
@@ -218,26 +218,26 @@ format(32, Integer::toHexString)</code></pre>
 
     <section>
         <h2 >Method reference examples</h2>
-        <pre><code class="java">// static method: (String) -&gt; void
+        <pre><code class="java">// static method: (String) =&gt; void
 Consumer&lt;String&gt; println = System.out::println;
 println.accept("Hello");
 
-// instace method of an arbitrary object: (String, String) -> String
+// instace method of an arbitrary object: (String, String) =&gt; String
 BinaryOperator&lt;String&gt; concat = String::concat;
 System.out.println( concat.apply("today", " is great") );
         
-// instace method of a particular object: (String) -&gt; String
+// instace method of a particular object: (String) =&gt; String
 UnaryOperator&lt;String&gt; concatInstance = "yes"::concat;
 System.out.println( concatInstance.apply(", it is") );
 
-// constructor with no params, () -&gt; Date, and int param, (Integer) -&gt; Date
+// constructor with no params, () =&gt; Date, and int param, (Integer) =&gt; Date
 Supplier&lt;Date&gt; date = Date::new;
-Function&lt;Integer, Date&gt; dateWithMillis = Date::new;
-System.out.println( "Today is " + date.get() + ", Epoch is " + dateWithMillis.apply(0) );</code></pre>
+Function&lt;Integer, Date&gt; dateMillis = Date::new;
+System.out.println( "Today: " + date.get() + ", Epoch: " + dateMillis.apply(0) );</code></pre>
     </section>
 
     <section>
-        <h2 >Progression to method references</h2>
+        <h2 >Progression from lambdas to method references</h2>
         <pre><code class="java">List&lt;File&gt; files = new ArrayList&lt;&gt;();
 files.sort(new Comparator&lt;File&gt;() {
     @Override
@@ -338,13 +338,13 @@ System.out.println("First 100 primes: " + primes.limit(100).collect( toList() ))
 
         <p>Partition into files/directories</p>
 
-        <pre><code class="java" >Map&lt;&gt;Boolean, List&lt;File&gt;&gt; filesByType = files.stream()
+        <pre><code class="java" >Map&lt;Boolean, List&lt;File&gt;&gt; filesByType = files.stream()
                 .collect( Collectors.groupingBy(File::isFile) );
 </code></pre>
 
         <p>Further partition by first letter of file</p>
 
-<pre><code class="java" >Map&lt;Boolean, Map&lt;String, List&lt;&gt;File&gt;&gt;&gt; filesByTypeByLetter = files.stream()
+<pre><code class="java" >Map&lt;Boolean, Map&lt;String, List&lt;File&gt;&gt;&gt; filesByTypeByLetter = files.stream()
                 .collect( groupingBy(File::isFile, 
                      groupingBy( (File f) -&gt; f.getName().substring(0, 1) ));
 </code></pre>
