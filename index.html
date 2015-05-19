@@ -190,19 +190,20 @@ public interface Comparator&lt;T&gt; {
     <section>
         <h2 class="slide-header">Method references</h2>
 
-        <p>Given the following interface</p>
+        <p>Given the following interface, we can use a lambda</p>
         <pre><code class="java mb-30">public interface MyFormatter&lt;T&gt; {
     String format(T object);
 }
 
 public &lt;T&gt; String format(T o,  MyFormatter&lt;T&gt; formatter) {
     return formatter.format(o);
-}</code></pre>
+}
+
+format( 32, i -> Integer.toHexString(i) );</code></pre>
 
         <div class="fragment tgap">
-            <p>We can simply reuse existing implementations</p>
-            <pre><code class="java">// Integer::toHexString signature is (Integer) -&gt; String
-format(32, Integer::toHexString)</code></pre>
+            <p>Or we can be more succinct and use a method reference</p>
+            <pre><code class="java mb-30">format( 32, Integer::toHexString );</code></pre>
         </div>
     </section>
 
